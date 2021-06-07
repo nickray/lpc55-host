@@ -90,7 +90,8 @@ fn try_main(args: clap::ArgMatches<'_>) -> anyhow::Result<()> {
     if let Some(subcommand) = args.subcommand_matches("configure") {
         if let Some(subcommand) = subcommand.subcommand_matches("factory-settings") {
             let config_path = std::path::Path::new(subcommand.value_of("CONFIG").unwrap());
-            let settings = fs::read_to_string(&config_path)?;
+            let settings = fs::read_to_string(&config_path)
+                .with_context(|| format!("Failed to read config from {}", config_path.display()))?;
             let mut wrapped_settings: lpc55::protected_flash::WrappedFactorySettings = match config_path.extension() {
                 Some(extension) => match extension {
                     os_str if os_str == "yaml" => {
@@ -128,7 +129,8 @@ fn try_main(args: clap::ArgMatches<'_>) -> anyhow::Result<()> {
 
         if let Some(subcommand) = subcommand.subcommand_matches("customer-settings") {
             let config_path = std::path::Path::new(subcommand.value_of("CONFIG").unwrap());
-            let settings = fs::read_to_string(&config_path)?;
+            let settings = fs::read_to_string(&config_path)
+                .with_context(|| format!("Failed to read config from {}", config_path.display()))?;
             let wrapped_settings: lpc55::protected_flash::WrappedCustomerSettings = match config_path.extension() {
                 Some(extension) => match extension {
                     os_str if os_str == "yaml" => {
@@ -240,7 +242,8 @@ fn try_main(args: clap::ArgMatches<'_>) -> anyhow::Result<()> {
             let bootloader = bootloader()?;
             let key = command::Key::try_from(command.value_of("KEY").unwrap()).unwrap();
             let keydata_filename = command.value_of("KEYDATA_FILENAME").unwrap();
-            let data = fs::read(keydata_filename)?;
+            let data = fs::read(keydata_filename)
+                .with_context(|| format!("Failed to read key data from {}", keydata_filename))?;
 
             let command = command::Command::Keystore(
                 command::KeystoreOperation::SetKey { key, data }
@@ -334,7 +337,9 @@ fn try_main(args: clap::ArgMatches<'_>) -> anyhow::Result<()> {
         let bootloader = bootloader()?;
         let address = clap::value_t!(command.value_of("ADDRESS"), usize)?;
         check_align(address)?;
-        let mut data = fs::read(command.value_of("INPUT").unwrap())?;
+        let data_file = command.value_of("INPUT").unwrap();
+        let mut data = fs::read(data_file)
+            .with_context(|| format!("Failed to read binary data from {}", data_file))?;
         let length = data.len();
         let overshoot = length % 512;
         if overshoot > 0 {
@@ -367,7 +372,8 @@ fn try_main(args: clap::ArgMatches<'_>) -> anyhow::Result<()> {
     if let Some(command) = args.subcommand_matches("receive-sb-file") {
         let bootloader = bootloader()?;
         let filename = command.value_of("SB-FILE").unwrap();
-        let image = fs::read(&filename)?;
+        let image = fs::read(&filename)
+            .with_context(|| format!("Failed to read SB2 file from {}", filename))?;
         bootloader.receive_sb_file(image);
         return Ok(());
     }

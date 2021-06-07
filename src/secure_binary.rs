@@ -350,6 +350,7 @@ impl UnsignedSb21File {
         let certificates = Certificates::try_from_pki(&config.pki)?;
         let signing_key = SigningKey::try_from_uri(config.pki.signing_key.as_ref())?;
         let slot = certificates.index_of(signing_key.public_key())?;
+        info!("using slot {:?}", slot);
 
         let keyblob = Keyblob { dek: config.reproducibility.dek, mac: config.reproducibility.mac };
 

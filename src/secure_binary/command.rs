@@ -314,7 +314,7 @@ impl BootCommand {
                 // let blocks = (data.len() + 3) / 4;
                 // let padding = blocks*16 - data.len();
                 let mut vec = Vec::from(cmd.to_bytes().as_ref());
-                println!("generated {}", &hex_str!(&vec, 4));
+                info!("generated {}", &hex_str!(&vec, 4));
                 // panic!();
                 vec.extend_from_slice(data.as_ref());
                 // add padding

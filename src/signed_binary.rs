@@ -40,12 +40,13 @@ impl ImageSigningRequest {
         let signing_key = SigningKey::try_from_uri(config.pki.signing_key.as_ref())?;
 
         let slot = certificates.index_of(signing_key.public_key())?;
+        info!("using slot {:?}", slot);
 
         Ok(Self {
             plain_image,
             certificates,
             signing_key,
-            slot: slot,
+            slot,
         })
     }
 
@@ -77,7 +78,7 @@ impl ImageSigningRequest {
         let certificate = word_padded(self.certificates.certificate_der(i.into()));
 
         let total_image_size = modify_header(&mut image, certificate.len());
-        // println!("{:x}", total_image_size);
+        info!("{:x}", total_image_size);
 
         let build_number = 1;
         let certificate_block_header = certificate_block_header_bytes(
@@ -153,7 +154,7 @@ fn certificate_block_header_bytes(total_image_length: usize, aligned_cert_length
     // grep for FOUR_CHAR_CODE
     extend32(&mut bytes, build_number);
     extendu(&mut bytes, total_image_length);
-    // println!("set length to {:x}", total_image_length);
+    info!("set length to {:x}", total_image_length);
 
     let certificates: u32 = 1;
     // one certificate
