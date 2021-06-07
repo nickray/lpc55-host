@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["DebugAccess","Wrapper around the detailed debug access settings, allowing to completely enable or disable with ease."],["DebugSetting","Controls access of debuggers to specific subsystems."]],"struct":[["DebugSettings",""]]});
